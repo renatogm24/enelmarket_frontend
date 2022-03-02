@@ -10,7 +10,14 @@ export default function middleware(req: NextRequest) {
   // (in the case of "test.vercel.app", "vercel.app" is the root URL)
 
   let currentHost = hostname.replace(`.${process.env.ROOT_URL}`, "");
-  if (currentHost === "localhost:3000" || currentHost === "enelmarket.com") {
+  if (currentHost === hostname) {
+    currentHost = hostname.replace(`.localtest.com:3000`, "");
+  }
+  if (
+    currentHost === "localhost:3000" ||
+    currentHost === "enelmarket.com" ||
+    currentHost === "localtest.com:3000"
+  ) {
     currentHost = "enelmarket";
   }
   /*const currentHost =

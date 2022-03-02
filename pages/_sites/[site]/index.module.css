@@ -1,0 +1,13 @@
+.hero_media {
+    min-width: 140px;
+    max-width: 140px;
+    min-height: 140px;
+    position: relative;
+    box-shadow: rgb(20, 20, 20) 0 0 10px;
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}

@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import TextField from "@material-ui/core/TextField";
-import { useQuery } from "@apollo/client";
-import { GET_STORES } from "../../../lib/queries/store";
 
 export default function CreateName({ setStep, setStoreName }) {
-  const { data, error, loading } = useQuery(GET_STORES);
-
   const [errorName, setErrorName] = useState({
     val: false,
     msg: "",
@@ -19,7 +15,7 @@ export default function CreateName({ setStep, setStoreName }) {
       .toLowerCase()
       .replace(/[^a-z0-9]/g, "");
 
-    const stores = data.stores.filter((item) => item.storeName === storeName);
+    const stores = [];
 
     if (e.target.name.value.toLowerCase() !== storeName) {
       setErrorName({

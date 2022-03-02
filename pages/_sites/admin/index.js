@@ -2,8 +2,6 @@ import Button from "../../../components/Button";
 import TextInput from "../../../components/TextInput";
 import Svg from "../../../components/enelmarket/svg.js";
 import { useRouter } from "next/router";
-import { Login as LoginMutation } from "../../../lib/queries/store.js";
-import { useMutation } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import Loader from "../../../components/Loader";
@@ -14,16 +12,35 @@ function index() {
   const [password, setPassword] = useState("");
   const [mail, setMail] = useState("");
   const [loadingComp, setLoadingComp] = useState(true);
+  const [error, setError] = useState(false);
 
-  const onCompleted = (data) => {
-    const { token, store } = Object.entries(data)[0][1];
-    persistSessionData({ token, viewer: store });
-    router.push("/home");
+  const loginSpring = async ({ password, mail }) => {
+    const body = { password: password, username: mail };
+    console.log(`body json object that will be POSTed is :${body}`);
+    console.log(password);
+    console.log(mail);
+
+    fetch("http://localhost:8080/api/login", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    }).then((res) => {
+      if (res.ok) {
+        return res.json().then((data) => {
+          console.log(data);
+          const { access_token, refresh_token } = data;
+          persistSessionData({ access_token, refresh_token });
+          router.push("/home");
+        });
+      } else {
+        setError(true);
+        console.log(res);
+      }
+    });
   };
-
-  const [login, { error, loading }] = useMutation(LoginMutation, {
-    onCompleted,
-  });
 
   let isUserAuth = false;
 
@@ -47,7 +64,7 @@ function index() {
         <form
           onSubmit={async (event) => {
             event.preventDefault();
-            await login({ variables: { password, mail } }).catch((err) => {
+            loginSpring({ password, mail }).catch((err) => {
               console.error(err);
             });
           }}
@@ -83,7 +100,7 @@ function index() {
               className="mr-2"
               text="Ingresa"
               type="submit"
-              disabled={loading}
+              disabled={loadingComp}
             />
             <p className="text-gray-400">¿Nuevo?</p>
             <button

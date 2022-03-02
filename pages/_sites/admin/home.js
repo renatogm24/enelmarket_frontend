@@ -2,12 +2,11 @@ import React, { useState } from "react";
 import styles from "./home.module.css";
 import Head from "next/head";
 import { Avatar } from "@material-ui/core";
-import { Logout } from "../../../lib/queries/store.js";
-import { useMutation } from "@apollo/client";
 import { useAuth } from "../../../context/AuthContext";
 import Loader from "../../../components/Loader";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
+import Axios from "axios";
 
 export default function index() {
   const router = useRouter();
@@ -15,19 +14,25 @@ export default function index() {
   const [selected, setSelected] = useState("");
   const [isActive, setIsActive] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
-  const [logout] = useMutation(Logout, {
-    onCompleted: () => {
-      clearSessionData();
-      router.push("/");
-    },
-  });
+  const [name, setName] = useState("");
 
   useEffect(() => {
     const isUserAuth = isAuthenticated();
     if (!isUserAuth) {
       router.push("/");
     } else {
+      Axios.get("http://localhost:8080/api/user/session", {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("access_token"),
+        },
+      })
+        .then((response) => {
+          console.log(response.data);
+          setName(response.data.name);
+        })
+        .catch((error) => {
+          setError(error);
+        });
       setIsLoading(false);
     }
   }, []);
@@ -38,7 +43,7 @@ export default function index() {
     return (
       <div>
         <Head>
-          <title>{viewer?.storeName} Dashboard</title>
+          <title>{name} Dashboard</title>
           <meta
             name="viewport"
             content="initial-scale=1.0, width=device-width"
@@ -66,9 +71,7 @@ export default function index() {
                       <span className={styles.icon}>
                         <ion-icon name="storefront-outline"></ion-icon>
                       </span>
-                      <span className={styles.title}>
-                        {viewer?.storeName || ""}
-                      </span>
+                      <span className={styles.title}>{name || ""}</span>
                     </a>
                   </li>
                   <li
@@ -156,8 +159,9 @@ export default function index() {
                     className={selected === "logout" ? styles.hovered : ""}
                     onClick={(e) => {
                       e.preventDefault();
-                      logout();
+                      clearSessionData();
                       setSelected("logout");
+                      router.push("/");
                     }}
                   >
                     <a href="#">
@@ -186,10 +190,7 @@ export default function index() {
                     </label>
                   </div>
                   <div className={styles.user}>
-                    <Avatar className={styles.avatar}>
-                      {`${viewer?.name[0].toUpperCase()}${viewer?.lastname[0].toUpperCase()}` ||
-                        ""}
-                    </Avatar>
+                    <Avatar className={styles.avatar}>{`${name}` || ""}</Avatar>
                   </div>
                 </div>
 

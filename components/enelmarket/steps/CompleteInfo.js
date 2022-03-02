@@ -1,17 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import TextField from "@material-ui/core/TextField";
-import { useMutation } from "@apollo/client";
-import { ADD_STORE, IS_MAIL_USED } from "../../../lib/queries/store";
-import { useQuery, useLazyQuery } from "@apollo/client";
 
 export default function CompleteInfo({ setStep, storeName }) {
-  const [addStore] = useMutation(ADD_STORE, {
-    onCompleted: () => {
-      setStep("finish");
-    },
-  });
-
   const [errorMail, setErrorMail] = useState({
     val: false,
     msg: "",
@@ -22,33 +13,8 @@ export default function CompleteInfo({ setStep, storeName }) {
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [getData, { loading, data }] = useLazyQuery(IS_MAIL_USED, {
-    onCompleted: () => {
-      onSubmitInfo();
-    },
-  });
-
   const onSubmitInfo = () => {
-    if (data?.isMailUsed) {
-      setErrorMail({
-        val: true,
-        msg: "Correo en uso",
-      });
-    } else {
-      const varInput = {
-        store: {
-          storeName,
-          name,
-          lastname,
-          mail,
-          password,
-        },
-      };
-
-      addStore({
-        variables: varInput,
-      });
-    }
+    setStep("finish");
   };
 
   return (
@@ -67,7 +33,7 @@ export default function CompleteInfo({ setStep, storeName }) {
             className="flex flex-col w-full"
             onSubmit={(e) => {
               e.preventDefault();
-              getData({ variables: { mail } });
+              onSubmitInfo();
             }}
           >
             <div className="flex flex-col w-5/6 self-center items-center space-y-2">
