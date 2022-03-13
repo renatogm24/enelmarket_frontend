@@ -1,6 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import Axios from "axios";
 import jwtDecode from "jwt-decode";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../redux/user";
+import { persistor } from "../../redux/store";
+import axios from "../../lib/clientProvider/axiosConfig";
 
 const AuthContext = createContext({
   checkingSession: null,
@@ -17,6 +21,8 @@ function AuthProvider({ children }) {
   const [error, setError] = useState();
   const [viewer, setViewer] = useState();
 
+  const dispatch = useDispatch();
+
   const persistSessionData = (authPayload) => {
     if (authPayload.access_token && authPayload.refresh_token) {
       const decodedToken = jwtDecode(authPayload.access_token);
@@ -29,6 +35,15 @@ function AuthProvider({ children }) {
       localStorage.setItem("refresh_token_expires_at", refresh_token_expiresAt);
       localStorage.setItem("refresh_token", authPayload.refresh_token);
       setViewer(decodedToken.sub);
+
+      axios
+        .get("/user/session")
+        .then((response) => {
+          dispatch(setUser({ user: response.data }));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
   };
 
@@ -38,7 +53,7 @@ function AuthProvider({ children }) {
     if (new Date().getTime() < expiresAt) {
       return true;
     } else if (new Date().getTime() < expiresRefreshAt) {
-      Axios.get("http://localhost:8080/api/token/refresh", {
+      Axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "/token/refresh", {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("refresh_token"),
         },
@@ -54,6 +69,7 @@ function AuthProvider({ children }) {
         });
       return true;
     } else {
+      persistor.purge();
       return false;
     }
   };
@@ -64,30 +80,9 @@ function AuthProvider({ children }) {
     localStorage.removeItem("refresh_token_expires_at");
     localStorage.removeItem("refresh_token");
     setViewer(null);
+    persistor.purge();
+    persistor.purge();
   };
-
-  useEffect(() => {
-    const getViewerIfAuthenticated = async () => {
-      isAuthenticated();
-      if (isAuthenticated() && !viewer) {
-        Axios.get("http://localhost:8080/api/user/session", {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("access_token"),
-          },
-        })
-          .then((response) => {
-            console.log(response.data);
-            setViewer({ name: response.data.name });
-          })
-          .catch((error) => {
-            window.location.reload(false);
-            setError(error);
-          });
-      }
-      setCheckingSession(false);
-    };
-    getViewerIfAuthenticated();
-  }, [viewer]);
 
   return (
     <AuthContext.Provider

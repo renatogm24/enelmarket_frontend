@@ -13,12 +13,10 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
-export default function CustomizedBadges() {
+export default function CustomizedBadges({ value }) {
   return (
-    <IconButton aria-label="cart">
-      <StyledBadge badgeContent={4} color="secondary">
-        <ShoppingCartIcon fontSize="large" />
-      </StyledBadge>
-    </IconButton>
+    <StyledBadge badgeContent={value} color="primary">
+      <ShoppingCartIcon fontSize="large" />
+    </StyledBadge>
   );
 }

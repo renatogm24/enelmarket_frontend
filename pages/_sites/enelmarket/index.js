@@ -10,6 +10,7 @@ export default function index() {
 
   const [step, setStep] = useState("welcome");
   const [storeName, setStoreName] = useState("");
+  //const [user, setUser] = useState({});
 
   let content = null;
 

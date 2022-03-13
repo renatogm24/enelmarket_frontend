@@ -1,20 +1,48 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import TextField from "@material-ui/core/TextField";
+import { useMutation, useQueryClient } from "react-query";
+import { useForm } from "react-hook-form";
+import { FormInputText } from "../../FormInputText";
+import axios from "../../../lib/clientProvider/axiosConfig";
+import { CircularProgress } from "@mui/material";
+import { Button } from "@mui/material";
+
+const saveUser = async (data) => {
+  const { data: response } = await axios.post("/user/save", data);
+  return response;
+};
 
 export default function CompleteInfo({ setStep, storeName }) {
-  const [errorMail, setErrorMail] = useState({
-    val: false,
-    msg: "",
+  const [errors, setErrors] = useState({});
+
+  const queryClient = useQueryClient();
+  const { handleSubmit, register, control } = useForm({
+    defaultValues: {
+      name: "",
+      lastname: "",
+      username: "",
+      password: "",
+      storeName,
+    },
   });
 
-  const [name, setName] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [mail, setMail] = useState("");
-  const [password, setPassword] = useState("");
+  const { mutate, isLoading } = useMutation(saveUser, {
+    onSuccess: () => {
+      setStep("finish");
+    },
+    onError: (error) => {
+      setErrors(error.response.data);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries("user/save");
+    },
+  });
 
-  const onSubmitInfo = () => {
-    setStep("finish");
+  const onSubmit = (data) => {
+    const user = {
+      ...data,
+    };
+    mutate(user);
   };
 
   return (
@@ -31,64 +59,59 @@ export default function CompleteInfo({ setStep, storeName }) {
         <div className="flex flex-col justify-center w-full">
           <form
             className="flex flex-col w-full"
-            onSubmit={(e) => {
-              e.preventDefault();
-              onSubmitInfo();
-            }}
+            onSubmit={handleSubmit(onSubmit)}
           >
             <div className="flex flex-col w-5/6 self-center items-center space-y-2">
-              <TextField
-                required
-                id="nameText"
-                label="Nombres"
-                variant="outlined"
-                className="w-full"
-                autoComplete="off"
-                name="name"
-                onChange={(e) => setName(e.target.value)}
+              <input type="hidden" {...register("storeName")} />
+              <FormInputText
+                name={"name"}
+                control={control}
+                label={"Nombres"}
+                errors={errors}
               />
-              <TextField
-                required
-                id="lastnameText"
-                label="Apellidos"
-                variant="outlined"
-                className="w-full"
-                autoComplete="off"
-                name="lastname"
-                onChange={(e) => setLastname(e.target.value)}
+              <FormInputText
+                name={"lastname"}
+                control={control}
+                label={"Apellidos"}
+                errors={errors}
               />
-              <TextField
-                required
-                id="mailText"
-                label="Correo"
-                type="mail"
-                variant="outlined"
-                className="w-full"
-                autoComplete="off"
-                name="mail"
-                onChange={(e) => setMail(e.target.value)}
-                error={errorMail.val}
-                helperText={errorMail.msg}
+              <FormInputText
+                name={"username"}
+                control={control}
+                label={"Correo"}
+                errors={errors}
               />
-              <TextField
-                required
-                id="password"
-                label="Clave"
-                type="password"
-                variant="outlined"
-                className="w-full"
-                autoComplete="new-password"
-                name="password"
-                onChange={(e) => setPassword(e.target.value)}
+              <FormInputText
+                name={"password"}
+                control={control}
+                label={"Clave"}
+                errors={errors}
+                type={"password"}
               />
             </div>
 
-            <button
+            <Button
+              color="primary"
               type="submit"
-              className="bg-blue-500 w-5/6 self-center text-white font-bold rounded-xl px-8 py-4 mt-8"
+              variant="contained"
+              disabled={isLoading}
+              sx={{
+                width: "83.33%",
+                borderRadius: "12px",
+                padding: "16px 32px",
+                margin: "32px 0",
+                textTransform: "none",
+                fontWeight: "700",
+                alignSelf: "center",
+              }}
+              startIcon={
+                isLoading ? (
+                  <CircularProgress color="inherit" size={25} />
+                ) : null
+              }
             >
               ¡Configura tu tienda!
-            </button>
+            </Button>
           </form>
         </div>
       </motion.div>

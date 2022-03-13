@@ -11,10 +11,10 @@ import { tabsClasses } from "@mui/material/Tabs";
 import Typography from "@mui/material/Typography";
 import Head from "next/head";
 import * as React from "react";
-import Loader from "../../../components/Loader";
+import Loader from "../../../../../components/Loader";
 import styles from "./index.module.css";
 import { upperFirst, lowerCase } from "lodash";
-import CustomizedBadges from "../../../components/CustomizedBadges";
+import CustomizedBadges from "../../../../../components/CustomizedBadges";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import "react-responsive-modal/styles.css";
@@ -30,11 +30,17 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
-import { decrement, increment } from "../../../redux/counter";
-import { persistor } from "../../../redux/store";
+import { decrement, increment } from "../../../../../redux/counter";
+import {
+  addToCart,
+  addToItemCart,
+  deleteFromCart,
+} from "../../../../../redux/cart";
+import { persistor } from "../../../../../redux/store";
 import { useQuery, QueryClient, dehydrate } from "react-query";
-import axios from "../../../lib/clientProvider/axiosConfig";
+import axios from "../../../../../lib/clientProvider/axiosConfig";
 import RemoveIcon from "@mui/icons-material/Remove";
+import SiteLayout from "../../../../../components/SiteLayout";
 
 function dynamicSort(property) {
   var sortOrder = 1;
@@ -49,32 +55,39 @@ function dynamicSort(property) {
   };
 }
 
-const getStore = async (storeName) => {
-  const { data } = await axios.get("/store", {
+const getCategory = async (storeName, categoria) => {
+  const { data } = await axios.get("/category", {
     params: {
       name: storeName,
+      order: categoria,
     },
   });
   console.log(data);
   return data;
 };
 
-export default function Index() {
+export default function index({ site, categoria }) {
   const router = useRouter();
-  const site = router.query.site;
+  //const site = router.query.site;
 
   const [categories, setCategories] = React.useState([]);
+
+  const [categoryData, setCategoryData] = React.useState({});
 
   const {
     isSuccess,
     data: dataStore,
     isLoading,
     isError,
-  } = useQuery(["getStore", site], () => getStore(site), {
-    onSuccess: (data) => {
-      setCategories(data.categories.sort(dynamicSort("orderCat")));
-    },
-  });
+  } = useQuery(
+    ["getCategory", site, categoria],
+    () => getCategory(site, categoria),
+    {
+      onSuccess: (data) => {
+        setCategoryData(data);
+      },
+    }
+  );
 
   if (!isLoading && !dataStore) {
     router.push("http://localhost:3000/");
@@ -251,6 +264,9 @@ export default function Index() {
   const [scroll, setScroll] = React.useState("paper");
 
   const handleClickOpenDialog = (scrollType, data) => () => {
+    setSelectedValue({});
+    setSelectedCombinatorie({});
+    setExistCombinatorie("");
     setCountDialog(1);
     setOpenDialog(true);
     setScroll(scrollType);
@@ -266,11 +282,11 @@ export default function Index() {
 
     if (data.variants.length > 0) {
       setExistCombinatorie("--");
+      setSelectedValue(selectedValueCp);
     } else {
       setExistCombinatorie(data.precio);
+      setSelectedValue({});
     }
-
-    setSelectedValue(selectedValueCp);
   };
 
   const handleCloseDialog = () => {
@@ -288,85 +304,33 @@ export default function Index() {
     setOpenDialogCart(false);
   };
 
+  const addToCartDispatch = () => {
+    const productToCart = {
+      producto: selectedProduct,
+      combinatoria: selectedCombinatorie,
+      cantidad: countDialog,
+      variante: selectedValue,
+    };
+    console.log(productToCart);
+    dispatch(addToCart(productToCart));
+    handleCloseDialog();
+  };
+
   if (!dataStore) {
     content = <Loader centered />;
   } else {
     content = (
-      <div>
-        <Head>
-          <meta name="viewport" content="initial-scale=1, width=device-width" />
-          <title>{upperFirst(lowerCase(dataStore.name))}</title>
-          <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-          />
-          <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/icon?family=Material+Icons"
-          />
-        </Head>
-        <div
-          className="w-full h-28 bg-no-repeat bg-center bg-cover m-0 p-0 mb-24"
-          style={{
-            backgroundImage: `url(${dataStore.portada_img?.url || ""})`,
-            backgroundColor: "rgba(0, 0, 0, 0.3)",
-            backgroundBlendMode: "darken",
-          }}
-        >
-          <Container fixed>
-            <div className="relative top-12 flex">
-              <div className={styles.hero_media}>
-                <img
-                  src={dataStore.logo_img?.url || ""}
-                  alt=""
-                  className={styles.image}
-                />
-              </div>
-              <div className="flex flex-grow flex-col justify-end ml-5 pb-5 text-2xl">
-                {upperFirst(lowerCase(dataStore.name))}
-              </div>
-              <div className="flex flex-grow justify-end place-items-end pb-2">
-                <IconButton
-                  onClick={handleClickOpenDialogCart("paper")}
-                  aria-label="cart"
-                >
-                  <CustomizedBadges />
-                </IconButton>
-              </div>
-            </div>
-          </Container>
-        </div>
-        <Container fixed sx={{ mb: "20px", mt: "100px" }}>
-          <Box sx={{ flexGrow: 1, maxWidth: "100%", bgcolor: "#ffffff" }}>
-            <StyledTabs
-              value={value}
-              onChange={handleChange2}
-              variant="scrollable"
-              scrollButtons="auto"
-              aria-label="visible arrows tabs example"
-              sx={{
-                [`& .${tabsClasses.scrollButtons}`]: {
-                  "&.Mui-disabled": { opacity: 1 },
-                },
-              }}
-            >
-              {categories.map((category) => (
-                <StyledTab label={category.name} />
-              ))}
-            </StyledTabs>
-          </Box>
-        </Container>
-
+      <>
         <Container fixed>
           <Typography variant="h6" gutterBottom component="div">
-            Descuentos
+            {categoryData.name}
           </Typography>
           <Grid
             container
             rowSpacing={3}
             columnSpacing={{ xs: 1, sm: 2, md: 3 }}
           >
-            {dataStore.categories[0].productos.map((producto) => (
+            {categoryData.productos.map((producto) => (
               <Grid item xs={6} sm={4} md={3} lg={2}>
                 <Item>
                   <div className="flex flex-col h-72 justify-between">
@@ -583,6 +547,7 @@ export default function Index() {
                   <Button
                     variant="contained"
                     disabled={existCombinatorie == "--"}
+                    onClick={addToCartDispatch}
                   >
                     Agregar
                   </Button>
@@ -591,111 +556,16 @@ export default function Index() {
             </Container>
           </DialogActions>
         </Dialog>
-
-        <Dialog
-          open={openDialogCart}
-          onClose={handleCloseDialogCart}
-          scroll={scroll}
-          aria-labelledby="scroll-dialog-title"
-          aria-describedby="scroll-dialog-description"
-          fullWidth
-        >
-          <DialogTitle id="scroll-dialog-title">
-            <div className="flex justify-between">
-              <span>Tu carrito</span>
-              <Button onClick={handleCloseDialogCart}>
-                <CancelIcon style={{ color: "grey" }} />
-              </Button>
-            </div>
-          </DialogTitle>
-          <DialogContent dividers={scroll === "paper"}>
-            <div className="flex flex-col">
-              <div className="flex gap-2">
-                <div className={styles.imageCartBx}>
-                  <img
-                    src="https://images.rappi.pe/products/687773-1645573519943.png?d=128x104&?d=1200xundefined&e=webp"
-                    alt=""
-                    className={styles.image}
-                  />
-                </div>
-                <div className="flex-grow flex flex-col text-sm gap-1">
-                  <span>Pizza Signature Seleccionada</span>
-                  <div className="flex gap-1">
-                    <span>
-                      <strong>S/19.90</strong>
-                    </span>
-                    <span>
-                      <strike>S/25.90</strike>
-                    </span>
-                  </div>
-                  <div className="flex">
-                    <LocalOfferIcon fontSize="small" color="primary" />
-                    <Typography
-                      variant="body2"
-                      color="primary"
-                      gutterBottom
-                      component="span"
-                      sx={{ margin: 0 }}
-                    >
-                      <strong>-52%</strong>
-                    </Typography>
-                  </div>
-                </div>
-                <div className="">
-                  <div className="flex gap-0 border items-center">
-                    <IconButton
-                      aria-label="delete"
-                      size="small"
-                      onClick={() => dispatch(decrement())}
-                    >
-                      <DeleteOutlineIcon />
-                    </IconButton>
-                    <span>1</span>
-                    <IconButton
-                      aria-label="delete"
-                      size="small"
-                      onClick={() => dispatch(increment())}
-                    >
-                      <AddIcon />
-                    </IconButton>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </DialogContent>
-          <DialogActions>
-            <Container fixed>
-              <div className="flex gap-2 justify-between items-center">
-                <IconButton
-                  aria-label="delete"
-                  size="small"
-                  onClick={() => purge()}
-                >
-                  <DeleteOutlineIcon />
-                </IconButton>
-                <div className="flex gap-2 flex-grow">
-                  <Link href="/order">
-                    <Button
-                      variant="contained"
-                      sx={{ width: "100%", textTransform: "none" }}
-                    >
-                      <div className="flex justify-between w-full">
-                        <span>Continuar</span>
-                        <span>Subtotal: {total}</span>
-                      </div>
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </Container>
-          </DialogActions>
-        </Dialog>
-      </div>
+      </>
     );
   }
 
   return content;
 }
+
+index.getLayout = function getLayout(index) {
+  return <SiteLayout>{index}</SiteLayout>;
+};
 
 export async function getStaticPaths() {
   return {
@@ -704,18 +574,22 @@ export async function getStaticPaths() {
   };
 }
 
-export async function getStaticProps({ params: { site } }) {
+export async function getStaticProps({ params: { site, categoria } }) {
   if (site == "enelmarket.com" || site == "localhost:3000") {
     site = "enelmarket";
   }
 
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery(["getStore", site], () => getStore(site));
+  await queryClient.prefetchQuery(["getCategory", site, categoria], () =>
+    getCategory(site, categoria)
+  );
 
   return {
     props: {
       dehydratedState: dehydrate(queryClient),
+      site,
+      categoria,
     },
     revalidate: 1,
   };

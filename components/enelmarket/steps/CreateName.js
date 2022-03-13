@@ -1,6 +1,18 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import TextField from "@material-ui/core/TextField";
+import { useQuery } from "react-query";
+import axios from "../../../lib/clientProvider/axiosConfig";
+import { useMutation, useQueryClient } from "react-query";
+
+const isNameValid = async ({ storeName }) => {
+  const { data } = await axios.get("/isNameValid", {
+    params: {
+      name: storeName,
+    },
+  });
+  return { data, storeName };
+};
 
 export default function CreateName({ setStep, setStoreName }) {
   const [errorName, setErrorName] = useState({
@@ -9,13 +21,36 @@ export default function CreateName({ setStep, setStoreName }) {
     css: "pb-0",
   });
 
+  const queryClient = useQueryClient();
+
+  const { mutate, isLoading } = useMutation(isNameValid, {
+    onSuccess: (data) => {
+      if (data.data) {
+        setErrorName({
+          val: true,
+          msg: "No disponible",
+          css: "pb-5",
+        });
+      } else {
+        setStoreName(data.storeName);
+        setStep("completeInfo");
+      }
+    },
+    onError: () => {
+      console.log("Hubo un error");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries("isNameValid");
+    },
+  });
+
   const onSubmit = (e) => {
     e.preventDefault();
     const storeName = e.target.name.value
       .toLowerCase()
       .replace(/[^a-z0-9]/g, "");
 
-    const stores = [];
+    //const stores = [];
 
     if (e.target.name.value.toLowerCase() !== storeName) {
       setErrorName({
@@ -23,15 +58,8 @@ export default function CreateName({ setStep, setStoreName }) {
         msg: "No se permite caracteres",
         css: "pb-9",
       });
-    } else if (stores.length) {
-      setErrorName({
-        val: true,
-        msg: "No disponible",
-        css: "pb-5",
-      });
     } else {
-      setStoreName(storeName);
-      setStep("completeInfo");
+      mutate({ storeName });
     }
   };
 

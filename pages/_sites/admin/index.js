@@ -20,7 +20,7 @@ function index() {
     console.log(password);
     console.log(mail);
 
-    fetch("http://localhost:8080/api/login", {
+    fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/login", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -33,7 +33,7 @@ function index() {
           console.log(data);
           const { access_token, refresh_token } = data;
           persistSessionData({ access_token, refresh_token });
-          router.push("/home");
+          router.push("/home/dashboard");
         });
       } else {
         setError(true);
@@ -47,7 +47,7 @@ function index() {
   useEffect(() => {
     isUserAuth = isAuthenticated();
     if (isUserAuth) {
-      router.push("/home");
+      router.push("/home/dashboard");
     } else {
       setLoadingComp(false);
     }
@@ -107,7 +107,7 @@ function index() {
               className="text-blue-500 hover:text-blue-700 ml-1 focus:outline-none hover:underline"
               onClick={(event) => {
                 event.preventDefault();
-                router.push("https://enelmarket.com/");
+                router.push("/");
               }}
             >
               Registrate

@@ -10,26 +10,24 @@ export default function middleware(req: NextRequest) {
   // (in the case of "test.vercel.app", "vercel.app" is the root URL)
 
   let currentHost = hostname.replace(`.${process.env.ROOT_URL}`, "");
-  if (currentHost === hostname) {
-    currentHost = hostname.replace(`.localtest.com:3000`, "");
-  }
-  if (
-    currentHost === "localhost:3000" ||
-    currentHost === "enelmarket.com" ||
-    currentHost === "localtest.com:3000"
-  ) {
+
+  if (currentHost === "localhost:3000" || currentHost === "enelmarket.com") {
     currentHost = "enelmarket";
   }
-  /*const currentHost =
-    process.env.NODE_ENV == "production"
-      ? hostname.replace(`.${process.env.ROOT_URL}`, "")
-      : hostname.replace(`.${process.env.CURR_HOST}`, "");*/
 
   // Prevent security issues – users should not be able to canonically access
   // the pages/sites folder and its respective contents. This can also be done
   // via rewrites to a custom 404 page
   if (pathname.startsWith(`/_sites`)) {
     return new Response(null, { status: 404 });
+  }
+
+  if (
+    pathname == "/" &&
+    currentHost != "enelmarket" &&
+    currentHost != "admin"
+  ) {
+    return NextResponse.redirect("/categorias/1");
   }
 
   if (
