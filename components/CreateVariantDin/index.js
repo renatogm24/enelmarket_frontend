@@ -17,8 +17,6 @@ export default function CreateVariantDin({ options, setOptions, keyOption }) {
       fullWidth
       freeSolo
       onChange={(event, value, reason) => {
-        //console.log(event, value, reason);
-        //setOptions(value);
         let optionsAux = { ...options };
 
         optionsAux[keyOption] = value;

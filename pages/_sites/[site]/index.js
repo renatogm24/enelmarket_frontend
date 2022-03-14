@@ -55,7 +55,6 @@ const getStore = async (storeName) => {
       name: storeName,
     },
   });
-  console.log(data);
   return data;
 };
 
@@ -96,7 +95,6 @@ export default function Index() {
 
   const purge = async () => {
     await persistor.purge();
-    console.log("Factory reset performed.");
     router.reload(window.location.pathname);
   };
 
@@ -217,13 +215,10 @@ export default function Index() {
     selectedCombinatorieCp["combText"] = combText;
     selectedCombinatorieCp["combTextSlash"] = combTextSlash;
 
-    console.log(combText);
-
     if (selectedProduct.variants.length > 0) {
       const filteredVariants = selectedProduct.combinatories.filter(
         (x) => x.name == combText
       );
-      console.log(filteredVariants);
       if (filteredVariants.length > 0) {
         setExistCombinatorie(filteredVariants[0].precio);
       } else {
@@ -257,8 +252,6 @@ export default function Index() {
     setSelectedProduct(data);
 
     let selectedValueCp = { ...selectedValue };
-
-    console.log(data.variants);
 
     for (const variant of data.variants) {
       selectedValueCp[variant.name] = "";

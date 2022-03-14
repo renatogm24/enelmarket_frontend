@@ -62,7 +62,6 @@ const getCategory = async (storeName, categoria) => {
       order: categoria,
     },
   });
-  console.log(data);
   return data;
 };
 
@@ -109,7 +108,6 @@ export default function index({ site, categoria }) {
 
   const purge = async () => {
     await persistor.purge();
-    console.log("Factory reset performed.");
     router.reload(window.location.pathname);
   };
 
@@ -230,13 +228,10 @@ export default function index({ site, categoria }) {
     selectedCombinatorieCp["combText"] = combText;
     selectedCombinatorieCp["combTextSlash"] = combTextSlash;
 
-    console.log(combText);
-
     if (selectedProduct.variants.length > 0) {
       const filteredVariants = selectedProduct.combinatories.filter(
         (x) => x.name == combText
       );
-      console.log(filteredVariants);
       if (filteredVariants.length > 0) {
         setExistCombinatorie(filteredVariants[0].precio);
       } else {
@@ -274,8 +269,6 @@ export default function index({ site, categoria }) {
 
     let selectedValueCp = { ...selectedValue };
 
-    console.log(data.variants);
-
     for (const variant of data.variants) {
       selectedValueCp[variant.name] = "";
     }
@@ -311,7 +304,6 @@ export default function index({ site, categoria }) {
       cantidad: countDialog,
       variante: selectedValue,
     };
-    console.log(productToCart);
     dispatch(addToCart(productToCart));
     handleCloseDialog();
   };
@@ -335,7 +327,7 @@ export default function index({ site, categoria }) {
                 <Item>
                   <div className="flex flex-col h-72 justify-between">
                     <img
-                      src={producto.producto_img.url}
+                      src={producto.producto_img?.url || ""}
                       alt=""
                       className={styles.imageGrid}
                     />

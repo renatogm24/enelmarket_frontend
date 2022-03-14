@@ -28,7 +28,7 @@ const getCobrosEnvios = async (storeName, categoria) => {
       name: storeName,
     },
   });
-  console.log(data);
+
   return data;
 };
 
@@ -83,7 +83,6 @@ export default function index() {
 
   const { mutate, isLoading } = useMutation(addEnvio, {
     onSuccess: (data) => {
-      console.log(data);
       reset({
         id: "",
         name: "",
@@ -102,13 +101,11 @@ export default function index() {
   });
 
   const onSubmit = (data) => {
-    console.log(data);
     mutate(data);
   };
 
   useEffect(() => {
     if (envioSelected) {
-      console.log(envioSelected);
       reset({
         id: envioSelected.id,
         name: envioSelected.name,
@@ -129,7 +126,6 @@ export default function index() {
     deleteProducto,
     {
       onSuccess: (data) => {
-        console.log(data);
         reset({
           id: "",
           name: "",
@@ -149,7 +145,6 @@ export default function index() {
   );
 
   const onSubmitDelete = ({ id }) => {
-    console.log(id);
     mutateDelete(id);
   };
 

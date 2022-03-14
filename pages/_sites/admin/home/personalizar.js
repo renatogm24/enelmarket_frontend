@@ -37,9 +37,7 @@ export default function index() {
   const { handleSubmit, register } = useForm();
 
   const { mutate, isLoading } = useMutation(changePictures, {
-    onSuccess: (data) => {
-      console.log(data);
-    },
+    onSuccess: (data) => {},
     onError: (error) => {
       setErrors(error.response.data);
     },
@@ -49,7 +47,6 @@ export default function index() {
   });
 
   const onSubmit = (data) => {
-    console.log("Llego aqui");
     const pictures = {
       ...data,
     };

@@ -72,7 +72,6 @@ export default function index() {
       }
 
       setIngresos(sum);
-      console.log(data);
     },
   });
 
@@ -103,7 +102,7 @@ export default function index() {
   const handleClickOpenDialog = (scrollType, data) => () => {
     setOpenDialog(true);
     setScroll(scrollType);
-    console.log(data);
+
     setselectedOrder(data);
   };
 
@@ -113,7 +112,6 @@ export default function index() {
 
   const { mutate, isLoading } = useMutation(updateOrder, {
     onSuccess: (data) => {
-      console.log(data);
       refetch();
       handleCloseDialog();
     },
@@ -126,7 +124,6 @@ export default function index() {
   });
 
   const onSubmit = (estado, id) => {
-    console.log(estado, id);
     mutate({ estado, id });
   };
 

@@ -9,9 +9,6 @@ export default function CreateVariant({
   reset,
   selected,
 }) {
-  //const options = [];
-  console.log(selected);
-  console.log(options);
   return (
     <Autocomplete
       key={reset}
@@ -24,8 +21,6 @@ export default function CreateVariant({
       fullWidth
       freeSolo
       onChange={(event, value, reason) => {
-        //console.log(event, value, reason);
-        //setOptions(value);
         let optionsAux = { ...options };
 
         for (let item of value) {

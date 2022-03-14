@@ -24,12 +24,10 @@ const getCobrosEnvios = async (storeName, categoria) => {
       name: storeName,
     },
   });
-  console.log(data);
   return data;
 };
 
 const updateOrden = async (data) => {
-  console.log(data);
   const { data: response } = await axios.post("/ordenes/updateOrden", data);
   return response;
 };
@@ -77,7 +75,6 @@ function payment({ site }) {
 
   const { mutate, isLoading } = useMutation(updateOrden, {
     onSuccess: (data) => {
-      console.log(data);
       reset();
       dispatch(setMailBuyer(data.email));
       router.push("/confirmation");

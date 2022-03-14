@@ -56,7 +56,6 @@ const getStores = async (storeName) => {
       name: storeName,
     },
   });
-  console.log(data);
   return data;
 };
 
@@ -66,8 +65,6 @@ export default function Index({ children }) {
   const router = useRouter();
   const site = router.query.site;
   const order = router.query.categoria;
-
-  console.log(order);
 
   const [categories, setCategories] = React.useState([]);
 
@@ -102,7 +99,6 @@ export default function Index({ children }) {
 
   const purge = async () => {
     await persistor.purge();
-    console.log("Factory reset performed.");
     router.reload(window.location.pathname);
   };
 
@@ -223,13 +219,10 @@ export default function Index({ children }) {
     selectedCombinatorieCp["combText"] = combText;
     selectedCombinatorieCp["combTextSlash"] = combTextSlash;
 
-    console.log(combText);
-
     if (selectedProduct.variants.length > 0) {
       const filteredVariants = selectedProduct.combinatories.filter(
         (x) => x.name == combText
       );
-      console.log(filteredVariants);
       if (filteredVariants.length > 0) {
         setExistCombinatorie(filteredVariants[0].precio);
       } else {
@@ -263,8 +256,6 @@ export default function Index({ children }) {
     setSelectedProduct(data);
 
     let selectedValueCp = { ...selectedValue };
-
-    console.log(data.variants);
 
     for (const variant of data.variants) {
       selectedValueCp[variant.name] = "";

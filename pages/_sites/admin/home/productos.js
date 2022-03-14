@@ -30,8 +30,6 @@ const addCategory = async (data) => {
   delete data.fotosrc;
   delete data.foto;
 
-  console.log(data);
-
   formData.append("producto", JSON.stringify(data));
 
   const { data: response } = await axios({
@@ -126,10 +124,8 @@ export default function index() {
     for (const keyOption of Object.keys(options)) {
       optionsArrays.push(options[keyOption]);
     }
-    console.log(optionsArrays);
     if (optionsArrays.length > 0) {
       let result = cartesian(...optionsArrays);
-      console.log(result);
       setCombinatories(result);
     }
   }, [options]);
@@ -148,7 +144,6 @@ export default function index() {
 
   const { mutate, isLoading } = useMutation(addCategory, {
     onSuccess: (data) => {
-      console.log(data);
       setCards(cards.concat(data));
       reset();
       setCombinatories([]);
@@ -170,7 +165,6 @@ export default function index() {
     deleteProducto,
     {
       onSuccess: (data) => {
-        console.log(data);
         window.location.reload(false);
       },
       onError: (error) => {
@@ -198,13 +192,10 @@ export default function index() {
     if (productoSelected == null) {
       window.location.reload(false);
     }
-    console.log(productoSelected);
     setCategoriesSelected(productoSelected.categories);
   }, [productoSelected]);
 
   const onSubmit = (data, options, categoriesSelected, combinatories) => {
-    console.log(data);
-
     let categoriesForm = [];
     for (const catAux of categoriesSelected) {
       categoriesForm.push(catAux.id);
@@ -228,8 +219,6 @@ export default function index() {
     data["variantsCombinatories"] = variantsCombinatories;
     data["fotosrc"] = data.foto[0];
 
-    console.log(data);
-
     const result = {
       ...data,
     };
@@ -238,16 +227,13 @@ export default function index() {
   };
 
   const onSubmitDelete = ({ id }) => {
-    console.log(id);
     mutateDelete(id);
   };
 
   const { mutate: mutateUpdate, isLoading: isLoadingUpdate } = useMutation(
     updateCategories,
     {
-      onSuccess: (data) => {
-        console.log(data);
-      },
+      onSuccess: (data) => {},
       onError: (error) => {
         setErrorsUpdate(error.response.data);
       },
@@ -263,7 +249,7 @@ export default function index() {
       element.orderCat = index;
       index++;
     });
-    console.log(data);
+
     mutateUpdate(data);
   };
 

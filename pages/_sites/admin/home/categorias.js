@@ -61,7 +61,6 @@ export default function index() {
 
   const { mutate, isLoading } = useMutation(addCategory, {
     onSuccess: (data) => {
-      console.log(data);
       setCards(cards.concat(data));
       reset();
     },
@@ -83,9 +82,7 @@ export default function index() {
   const { mutate: mutateUpdate, isLoading: isLoadingUpdate } = useMutation(
     updateCategories,
     {
-      onSuccess: (data) => {
-        console.log(data);
-      },
+      onSuccess: (data) => {},
       onError: (error) => {
         setErrorsUpdate(error.response.data);
       },
@@ -101,7 +98,7 @@ export default function index() {
       element.orderCat = index;
       index++;
     });
-    console.log(data);
+
     mutateUpdate(data);
   };
 

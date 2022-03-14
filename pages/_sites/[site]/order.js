@@ -33,12 +33,10 @@ const getCobrosEnvios = async (storeName, categoria) => {
       name: storeName,
     },
   });
-  console.log(data);
   return data;
 };
 
 const addOrden = async (data) => {
-  console.log(data);
   const { data: response } = await axios.post("/ordenes/addOrden", data);
   return response;
 };
@@ -76,7 +74,6 @@ export default function order({ site }) {
         (x) => x.tipo.charAt(0).toUpperCase() + x.tipo.slice(1)
       );
       const uniq = [...new Set(cobrosRaw)];
-      console.log(uniq);
 
       setCobros(uniq);
       setEnvios(data[1]);
@@ -129,7 +126,6 @@ export default function order({ site }) {
 
   const { mutate, isLoading } = useMutation(addOrden, {
     onSuccess: (data) => {
-      console.log(data);
       reset();
       dispatch(setIdCart(data.id));
       router.push("/payment");
@@ -180,7 +176,6 @@ export default function order({ site }) {
     });
     data["productos"] = productosArr;
     data["storeName"] = site;
-    console.log(data);
     mutate(data);
   };
 

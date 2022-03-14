@@ -15,8 +15,6 @@ export default function CheckboxesTags({
   selected,
   label,
 }) {
-  console.log(selected);
-  console.log(options);
   return (
     <Autocomplete
       key={reset}

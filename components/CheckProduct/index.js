@@ -22,7 +22,6 @@ export default function CheckboxesTags({
       disableCloseOnSelect
       fullWidth
       onChange={(event, value, reason) => {
-        console.log(value);
         setProductoSelected(value);
       }}
       getOptionLabel={(option) => option.name}

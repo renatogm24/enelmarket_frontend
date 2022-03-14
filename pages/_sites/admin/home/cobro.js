@@ -37,7 +37,7 @@ const getCobrosEnvios = async (storeName, categoria) => {
       name: storeName,
     },
   });
-  console.log(data);
+
   return data;
 };
 
@@ -83,7 +83,6 @@ export default function index() {
 
   const { mutate, isLoading } = useMutation(addCobro, {
     onSuccess: (data) => {
-      console.log(data);
       reset({
         id: "",
         name: "",
@@ -103,7 +102,7 @@ export default function index() {
 
   const onSubmit = (data, tipo) => {
     data["tipo"] = tipo;
-    console.log(data);
+
     mutate(data);
   };
 
@@ -130,7 +129,6 @@ export default function index() {
     deleteProducto,
     {
       onSuccess: (data) => {
-        console.log(data);
         reset({
           id: "",
           name: "",
@@ -150,7 +148,6 @@ export default function index() {
   );
 
   const onSubmitDelete = ({ id }) => {
-    console.log(id);
     mutateDelete(id);
   };
 

@@ -16,12 +16,7 @@ export default function Categories({ cards, setCards, setErrorCategories }) {
     );
   }, []);
 
-  useEffect(() => {
-    console.log(cards);
-  }, [cards]);
-
   const deleteCard = useCallback((id, cardsAux) => {
-    console.log(cardsAux.length);
     if (cardsAux.length <= 1) {
       setErrorCategories("No se puede quedar sin categorías");
       setTimeout(() => {

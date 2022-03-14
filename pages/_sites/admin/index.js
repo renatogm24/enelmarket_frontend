@@ -16,9 +16,6 @@ function index() {
 
   const loginSpring = async ({ password, mail }) => {
     const body = { password: password, username: mail };
-    console.log(`body json object that will be POSTed is :${body}`);
-    console.log(password);
-    console.log(mail);
 
     fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/login", {
       method: "POST",
@@ -30,14 +27,12 @@ function index() {
     }).then((res) => {
       if (res.ok) {
         return res.json().then((data) => {
-          console.log(data);
           const { access_token, refresh_token } = data;
           persistSessionData({ access_token, refresh_token });
           router.push("/home/dashboard");
         });
       } else {
         setError(true);
-        console.log(res);
       }
     });
   };
