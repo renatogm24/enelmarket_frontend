@@ -31,6 +31,7 @@ function index() {
           persistSessionData({ access_token, refresh_token });
           router.push("/home/dashboard");
           console.log("Hola");
+          console.log("Hola2");
         });
       } else {
         setError(true);
