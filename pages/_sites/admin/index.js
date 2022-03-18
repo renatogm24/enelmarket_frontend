@@ -32,6 +32,7 @@ function index() {
           router.push("/home/dashboard");
           console.log("Hola");
           console.log("Hola2");
+          console.log("Hola3");
         });
       } else {
         setError(true);
