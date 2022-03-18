@@ -30,6 +30,7 @@ function index() {
           const { access_token, refresh_token } = data;
           persistSessionData({ access_token, refresh_token });
           router.push("/home/dashboard");
+          console.log("Hola");
         });
       } else {
         setError(true);
